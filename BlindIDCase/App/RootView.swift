@@ -10,10 +10,13 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject var session: SessionManager
     var body: some View {
-        if session.isLoggedIn {
-            MainTabView()
-        } else {
-            LoginView()
+        switch session.authState {
+            case .checkingToken:
+                SplashView()
+            case .loggedIn:
+                MainTabView()
+            case .loggedOut:
+                LoginView()
         }
     }
 }

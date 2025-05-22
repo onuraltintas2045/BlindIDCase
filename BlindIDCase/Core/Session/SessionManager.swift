@@ -9,28 +9,39 @@ import Foundation
 
 final class SessionManager: ObservableObject {
     static let shared = SessionManager()
-    
-    @Published var isLoggedIn: Bool = false
+    @Published var authState: AuthState = .checkingToken
+    @Published var currentUser: User?
 
     private init() {
-        checkLoginStatus()
+        validateSession()
     }
 
-    func checkLoginStatus() {
-        if let token = KeychainManager.readToken(), !token.isEmpty {
-            self.isLoggedIn = true
-        } else {
-            self.isLoggedIn = false
+    func validateSession() {
+        guard let token = KeychainManager.readToken(), !token.isEmpty else {
+            self.authState = .loggedOut
+            return
+        }
+        
+        UserService.getCurrentUser { result in
+            DispatchQueue.main.async {
+                switch result {
+                    case .success(let user):
+                        self.currentUser = user
+                        self.authState = .loggedIn
+                    case .failure:
+                        self.authState = .loggedOut
+                }
+            }
         }
     }
 
     func logout() {
         KeychainManager.clear()
-        isLoggedIn = false
+        self.authState = .loggedOut
     }
     
     func login(with token: String) {
         KeychainManager.save(token: token)
-        self.isLoggedIn = true
+        self.authState = .loggedIn
     }
 }
