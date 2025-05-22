@@ -14,7 +14,7 @@
 		839A6E432DDEFB9A00CF6306 /* Exceptions for "BlindIDCase" folder in "BlindIDCase" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = 839A6E2E2DDEF90900CF6306 /* BlindIDCase */;
 		};
@@ -267,7 +267,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BlindIDCase/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BlindIDCase/Info.plist;
+				INFOPLIST_FILE = BlindIDCase/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -298,7 +298,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"BlindIDCase/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = BlindIDCase/Info.plist;
+				INFOPLIST_FILE = BlindIDCase/Resources/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
