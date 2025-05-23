@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @Binding var showLogin: Bool
 
     var body: some View {
         VStack(spacing: 20) {
@@ -19,7 +18,6 @@ struct RegisterView: View {
             Text("Buraya kayıt alanları eklenecek...")
 
             Button("Kayıt Olmayı Tamamla") {
-                showLogin = false
             }
             .foregroundColor(.white)
             .padding()

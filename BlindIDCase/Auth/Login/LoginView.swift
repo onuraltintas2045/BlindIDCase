@@ -6,53 +6,107 @@
 //
 
 import SwiftUI
+import Combine
 
+// TODO: - Klavye yüksekliğine göre layout güncellemesi yapılmalı
 struct LoginView: View {
-    @State private var tokenInput: String = ""
-    @ObservedObject private var session = SessionManager.shared
-    @State private var showRegister = false
-
+    
+    @StateObject private var viewModel = LoginViewModel()
+    @State var isPasswordVisible: Bool = false
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Text("Login View")
-                    .font(.title)
-                    .bold()
-
-                TextField("Token girin", text: $tokenInput)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
-
-                Button("Giriş Yap") {
-                    login()
+                Spacer().frame(height: 60)
+                
+                Image("Logo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 120, height: 120)
+                    .clipped()
+                
+                Spacer().frame(height: 40)
+                
+                TextField("E-posta", text: $viewModel.email)
+                    .keyboardType(.emailAddress)
+                    .font(.system(size: 14, weight: .regular, design: .default))
+                    .padding()
+                    .frame(height: 45)
+                    .background(RoundedRectangle(cornerRadius: 8)
+                        .stroke(viewModel.showEmailError ? Color.red : Color.gray, lineWidth: 1))
+                
+                ZStack(alignment: .trailing) {
+                    Group {
+                        if isPasswordVisible {
+                            TextField("Şifre", text: $viewModel.password)
+                        } else {
+                            SecureField("Şifre", text: $viewModel.password)
+                        }
+                    }
+                    .font(.system(size: 14, weight: .regular, design: .default))
+                    .padding(.trailing, 40)
+                    .padding()
+                    .frame(height: 45)
+                    .background(RoundedRectangle(cornerRadius: 8)
+                        .stroke(viewModel.showPasswordError ? Color.red : Color.gray, lineWidth: 1))
+                    
+                    Button(action: {
+                        isPasswordVisible.toggle()
+                    }) {
+                        Image(systemName: isPasswordVisible ? "eye.slash.fill" : "eye.fill")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.trailing, 12)
                 }
-                .foregroundColor(.white)
-                .padding()
-                .frame(maxWidth: .infinity)
+                
+                Button {
+                    viewModel.login {
+                        print("giriş başarılı")
+                    }
+                } label: {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    } else {
+                        Text("Giriş Yap")
+                            .foregroundColor(.white)
+                            .font(.system(size: 12, weight: .regular, design: .default))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                }
                 .background(Color.blue)
+                .frame(height: 35)
                 .cornerRadius(8)
-                .padding(.horizontal)
+                
+                Spacer()
 
-                Button("Kayıt Ol") {
-                    showRegister = true
+                VStack(spacing: 0) {
+                    NavigationLink(destination: RegisterView()) {
+                        Text("Yeni Hesap Oluştur")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 12, weight: .regular, design: .default))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                    .frame(height: 35)
+                    .background(RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.blue, lineWidth: 1))
+                    
+                    Image("LaunchImage")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 80, height: 40)
+                        .clipped()
                 }
-                .padding(.top)
-
-                NavigationLink(destination: RegisterView(showLogin: $showRegister),
-                               isActive: $showRegister) {
-                    EmptyView()
-                }
+                
             }
             .padding()
+            .allowsHitTesting(!viewModel.isLoading)
+            .background(viewModel.isLoading ? Color.black.opacity(0.3) : Color.white)
+            
         }
     }
-
-    private func login() {
-        guard !tokenInput.isEmpty else { return }
-        session.login(with: tokenInput)
-    }
-}
-
-#Preview {
-    LoginView()
 }
