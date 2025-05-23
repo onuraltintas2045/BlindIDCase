@@ -27,7 +27,7 @@ struct LoginView: View {
                 
                 Spacer().frame(height: 40)
                 
-                TextField("E-posta", text: $viewModel.email)
+                TextField("Email", text: $viewModel.email)
                     .keyboardType(.emailAddress)
                     .font(.system(size: 14, weight: .regular, design: .default))
                     .padding()
@@ -38,9 +38,9 @@ struct LoginView: View {
                 ZStack(alignment: .trailing) {
                     Group {
                         if isPasswordVisible {
-                            TextField("Şifre", text: $viewModel.password)
+                            TextField("Password", text: $viewModel.password)
                         } else {
-                            SecureField("Şifre", text: $viewModel.password)
+                            SecureField("Password", text: $viewModel.password)
                         }
                     }
                     .font(.system(size: 14, weight: .regular, design: .default))
@@ -59,6 +59,14 @@ struct LoginView: View {
                     .padding(.trailing, 12)
                 }
                 
+                if viewModel.showEmailError || viewModel.showPasswordError  {
+                    Text("Please fill out all fields.")
+                        .font(.caption)
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 8)
+                }
+                
                 Button {
                     viewModel.login()
                 } label: {
@@ -68,7 +76,7 @@ struct LoginView: View {
                             .frame(maxWidth: .infinity)
                             .padding()
                     } else {
-                        Text("Giriş Yap")
+                        Text("Log In")
                             .foregroundColor(.white)
                             .font(.system(size: 12, weight: .regular, design: .default))
                             .frame(maxWidth: .infinity)
@@ -83,7 +91,7 @@ struct LoginView: View {
 
                 VStack(spacing: 0) {
                     NavigationLink(destination: RegisterView()) {
-                        Text("Yeni Hesap Oluştur")
+                        Text("Create an Account")
                             .foregroundColor(.blue)
                             .font(.system(size: 12, weight: .regular, design: .default))
                             .frame(maxWidth: .infinity)

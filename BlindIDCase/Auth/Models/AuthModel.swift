@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LoginUser: Codable {
+struct AuthUser: Codable {
     let id: String
     let name: String
     let surname: String
@@ -19,14 +19,22 @@ struct LoginRequest: Codable {
     let password: String
 }
 
-struct LoginResponse: Codable {
+struct RegisterRequest: Codable {
+    let name: String
+    let surname: String
+    let email: String
+    let password: String
+}
+
+struct AuthResponse: Codable {
     let message: String
     let token: String
-    let user: LoginUser
+    let user: AuthUser
 }
 
 enum AuthError: Error, LocalizedError {
     case invalidCredentials
+    case userAlreadyExists
     case requestError(Error)
     case unknown
 
@@ -34,6 +42,8 @@ enum AuthError: Error, LocalizedError {
         switch self {
         case .invalidCredentials:
             return "E-posta veya şifre hatalı."
+        case .userAlreadyExists:
+            return "Bu e-posta adresi zaten kullanılıyor."
         case .requestError:
             return "Bir hata oluştu. Lütfen tekrar deneyin."
         case .unknown:
