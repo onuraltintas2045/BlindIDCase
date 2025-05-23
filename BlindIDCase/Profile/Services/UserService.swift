@@ -7,15 +7,13 @@
 
 import Foundation
 
-enum UserServiceError: Error {
-    case invalidToken
-    case requestFailed(Error)
-    case decodingFailed
-    case unknown
-}
 
 final class UserService {
-    static func getCurrentUser(completion: @escaping (Result<User, UserServiceError>) -> Void) {
+    
+    static let shared = UserService()
+    private init() {}
+    
+    func getCurrentUser(completion: @escaping (Result<User, UserServiceError>) -> Void) {
         guard let token = KeychainManager.readToken(), !token.isEmpty else {
             completion(.failure(.invalidToken))
             return

@@ -26,3 +26,10 @@ struct User: Codable {
         case updatedAt
     }
 }
+
+enum UserServiceError: Error {
+    case invalidToken
+    case requestFailed(Error)
+    case decodingFailed
+    case unknown
+}

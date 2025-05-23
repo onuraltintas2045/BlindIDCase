@@ -22,7 +22,7 @@ final class SessionManager: ObservableObject {
             return
         }
         
-        UserService.getCurrentUser { result in
+        UserService.shared.getCurrentUser { result in
             DispatchQueue.main.async {
                 switch result {
                     case .success(let user):
