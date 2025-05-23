@@ -7,7 +7,7 @@
 
 import Foundation
 
-
+// TODO: - AuthService' de yaptığımız response handling buraya da uygulanacak, en son bütün Service yapıları ortaklanabilir mi diye bakılacak.
 final class UserService {
     
     static let shared = UserService()

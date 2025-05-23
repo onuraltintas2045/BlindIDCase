@@ -35,14 +35,23 @@ final class LoginViewModel: ObservableObject {
         return !showEmailError && !showPasswordError
     }
 
-    func login(completion: @escaping () -> Void) {
+    func login() {
         guard validateFields() else { return }
-
+        
         isLoading = true
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.isLoading = false
-            completion()
+        
+        AuthService.shared.login(email: email, password: password) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.isLoading = false
+                switch result {
+                    case .success(let response):
+                        SessionManager.shared.login(with: response.token)
+                    case .failure(let error):
+                        // TODO: - Hata Mesajı Gösteren Genel Bir Yapı Eklenecek
+                        print(error.errorDescription ?? "Bilinmeyen bir hata oluştu")
+                }
+            }
         }
     }
 }

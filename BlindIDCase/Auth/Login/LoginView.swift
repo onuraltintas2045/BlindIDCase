@@ -60,9 +60,7 @@ struct LoginView: View {
                 }
                 
                 Button {
-                    viewModel.login {
-                        print("giriş başarılı")
-                    }
+                    viewModel.login()
                 } label: {
                     if viewModel.isLoading {
                         ProgressView()
