@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class RegisterViewModel: ObservableObject {
     @Published var email: String = "" {
         didSet {
@@ -43,6 +44,13 @@ final class RegisterViewModel: ObservableObject {
     @Published var showFirstNameError: Bool = false
     @Published var showLastNameError: Bool = false
     @Published var showPasswordError: Bool = false
+    @Published var registerErrorMessage: String?
+
+    private let authService: AuthServiceProtocol
+
+    init(authService: AuthServiceProtocol = AuthService.shared) {
+        self.authService = authService
+    }
 
     func validateFields() -> Bool {
         showEmailError = email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -55,21 +63,22 @@ final class RegisterViewModel: ObservableObject {
 
     func register() {
         guard validateFields() else { return }
-        
-        isLoading = true
-        
-        AuthService.shared.register(email: email, name: firstName, surname: lastName, password: password) { [weak self] result in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                self.isLoading = false
-                switch result {
-                    case .success(let response):
-                        SessionManager.shared.login(with: response.token)
-                    case .failure(let error):
-                        // TODO: - Hata Mesajı Gösteren Genel Bir Yapı Eklenecek
-                        print(error.errorDescription ?? "Bilinmeyen bir hata oluştu")
-                }
+        Task {
+            isLoading = true
+            do {
+                let response = try await authService.register(
+                    email: email,
+                    name: firstName,
+                    surname: lastName,
+                    password: password
+                )
+                SessionManager.shared.login(with: response.token)
+            } catch let error as AuthError {
+                registerErrorMessage = error.localizedDescription
+            } catch {
+                registerErrorMessage = "Bilinmeyen bir hata oluştu."
             }
+            isLoading = false
         }
     }
 }

@@ -7,116 +7,75 @@
 
 import Foundation
 
+protocol AuthServiceProtocol {
+    func login(email: String, password: String) async throws -> AuthResponse
+    func register(email: String, name: String, surname: String, password: String) async throws -> AuthResponse
+}
+
 // TODO: - Bütün yapılar oluşturulduktan sonra service yapıları ortaklanabilir mi diye kontrol edilecek.
-final class AuthService {
+final class AuthService: AuthServiceProtocol {
     
     static let shared = AuthService()
     
     private init() {}
     
-    func login(email: String, password: String, completion: @escaping (Result<AuthResponse, AuthError>) -> Void) {
-        
-        guard let url = URL(string: "https://moviatask.cerasus.app/api/auth/login") else {
-            completion(.failure(.unknown))
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+    func login(email: String, password: String) async throws -> AuthResponse {
+        let endpoint = "https://moviatask.cerasus.app/api/auth/login"
         let body = LoginRequest(email: email, password: password)
-        
-        do {
-            request.httpBody = try JSONEncoder().encode(body)
-        } catch {
-            completion(.failure(.unknown))
-            return
-        }
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(.requestError(error)))
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                completion(.failure(.unknown))
-                return
-            }
-            
-            switch httpResponse.statusCode {
-                case 200:
-                    guard let data = data else {
-                        completion(.failure(.unknown))
-                        return
-                    }
-                    
-                    do {
-                        let user = try JSONDecoder().decode(AuthResponse.self, from: data)
-                        completion(.success(user))
-                    } catch {
-                        completion(.failure(.unknown))
-                    }
-                case 400:
-                    completion(.failure(.invalidCredentials))
-                default:
-                    completion(.failure(.unknown))
-                    
-            }
-        }.resume()
+        return try await sendRequest(to: endpoint, method: "POST", body: body, expectedStatus: 200, requestType: .login)
     }
     
-    func register(email: String, name: String, surname: String, password: String, completion: @escaping (Result<AuthResponse, AuthError>) -> Void) {
-        
-        guard let url = URL(string: "https://moviatask.cerasus.app/api/auth/register") else {
-            completion(.failure(.unknown))
-            return
+    func register(email: String, name: String, surname: String, password: String) async throws -> AuthResponse {
+        let endpoint = "https://moviatask.cerasus.app/api/auth/register"
+        let body = RegisterRequest(name: name, surname: surname, email: email, password: password)
+        return try await sendRequest(to: endpoint, method: "POST", body: body, expectedStatus: 200, requestType: .register)
+    }
+    
+    private func sendRequest<T: Encodable>(
+        to urlString: String,
+        method: String,
+        body: T,
+        expectedStatus: Int,
+        requestType: RequestType
+    ) async throws -> AuthResponse {
+        guard let url = URL(string: urlString) else {
+            throw AuthError.unknown
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = method
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body = RegisterRequest(name: name, surname: surname, email: email, password: password)
         
         do {
             request.httpBody = try JSONEncoder().encode(body)
         } catch {
-            completion(.failure(.unknown))
-            return
+            throw AuthError.unknown
         }
         
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(.failure(.requestError(error)))
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                completion(.failure(.unknown))
-                return
-            }
-            
-            switch httpResponse.statusCode {
-                case 201:
-                    guard let data = data else {
-                        completion(.failure(.unknown))
-                        return
-                    }
-                    
-                    do {
-                        let user = try JSONDecoder().decode(AuthResponse.self, from: data)
-                        completion(.success(user))
-                    } catch {
-                        completion(.failure(.unknown))
-                    }
-                case 400:
-                    completion(.failure(.userAlreadyExists))
-                default:
-                    completion(.failure(.unknown))
-                    
-            }
-        }.resume()
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw AuthError.unknown
+        }
+        
+        switch httpResponse.statusCode {
+            case expectedStatus:
+                do {
+                    return try JSONDecoder().decode(AuthResponse.self, from: data)
+                } catch {
+                    throw AuthError.unknown
+                }
+            case 400:
+                if requestType == .login {
+                    throw AuthError.invalidCredentials
+                } else if requestType == .register {
+                    throw AuthError.userAlreadyExists
+                } else {
+                    throw AuthError.unknown
+                }
+            default:
+                throw AuthError.unknown
+                
+        }
     }
 }

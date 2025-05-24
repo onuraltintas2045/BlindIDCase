@@ -32,6 +32,11 @@ struct AuthResponse: Codable {
     let user: AuthUser
 }
 
+enum RequestType {
+    case login
+    case register
+}
+
 enum AuthError: Error, LocalizedError {
     case invalidCredentials
     case userAlreadyExists
