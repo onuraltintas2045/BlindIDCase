@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class SessionManager: ObservableObject {
     static let shared = SessionManager()
     @Published var authState: AuthState = .fetchingCurrentUser
@@ -21,12 +22,8 @@ final class SessionManager: ObservableObject {
             return
         }
         
-        self.authState = .fetchingCurrentUser
-        
-        UserDataManager.shared.fetchCurrentUser { success in
-
-            success ? (self.authState = .loggedIn) : self.logout()
-            
+        Task {
+            await updateAuthStateAfterUserFetch()
         }
     }
 
@@ -38,11 +35,14 @@ final class SessionManager: ObservableObject {
     
     func login(with token: String) {
         KeychainManager.save(token: token)
-        
-        self.authState = .fetchingCurrentUser
-
-        UserDataManager.shared.fetchCurrentUser { success in
-            success ? (self.authState = .loggedIn) : self.logout()
+        Task {
+            await updateAuthStateAfterUserFetch()
         }
+    }
+    
+    private func updateAuthStateAfterUserFetch() async {
+        self.authState = .fetchingCurrentUser
+        let success = await UserDataManager.shared.fetchCurrentUser()
+        self.authState = success ? .loggedIn : .loggedOut
     }
 }

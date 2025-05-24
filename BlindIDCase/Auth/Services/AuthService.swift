@@ -28,7 +28,7 @@ final class AuthService: AuthServiceProtocol {
     func register(email: String, name: String, surname: String, password: String) async throws -> AuthResponse {
         let endpoint = "https://moviatask.cerasus.app/api/auth/register"
         let body = RegisterRequest(name: name, surname: surname, email: email, password: password)
-        return try await sendRequest(to: endpoint, method: "POST", body: body, expectedStatus: 200, requestType: .register)
+        return try await sendRequest(to: endpoint, method: "POST", body: body, expectedStatus: 201, requestType: .register)
     }
     
     private func sendRequest<T: Encodable>(

@@ -7,29 +7,29 @@
 
 import Foundation
 
+@MainActor
 final class UserDataManager: ObservableObject {
-    
+
     static let shared = UserDataManager()
+
     @Published var currentUser: User?
-    
-    private init() {}
-    
-    func fetchCurrentUser(completion: @escaping (Bool) -> Void) {
-        UserService.shared.getCurrentUser { result in
-            DispatchQueue.main.async {
-                switch result {
-                    case .success(let user):
-                        self.currentUser = user
-                        completion(true)
-                    case .failure:
-                        // TODO: - Kullanıcı Verisi Alınırken Bir Hata oluştu diyerek çıkış yap butonu eklenmeli
-                        self.currentUser = nil
-                        completion(false)
-                }
-            }
+
+    private let userService: UserServiceProtocol
+
+    private init(userService: UserServiceProtocol = UserService.shared) {
+        self.userService = userService
+    }
+
+    func fetchCurrentUser() async -> Bool {
+        do {
+            let user = try await userService.getCurrentUser()
+            self.currentUser = user
+            return true
+        } catch {
+            return false
         }
     }
-    
+
     func clearUser() {
         self.currentUser = nil
     }
