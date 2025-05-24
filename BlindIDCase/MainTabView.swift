@@ -8,33 +8,31 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @ObservedObject private var session = SessionManager.shared
+    
+    init() {
+        UITabBar.appearance().backgroundColor = UIColor.systemGray6
+    }
+    
     var body: some View {
-        VStack(spacing: 20) {
-            Text("MainTabView")
-                .font(.title)
-                .bold()
+        TabView {
+            HomeView()
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Home")
+                }
 
-            Button(action: {
-                logout()
-            }) {
-                Text("Çıkış Yap")
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(8)
-                    .padding(.horizontal)
-            }
+            FavoritesView()
+                .tabItem {
+                    Image(systemName: "heart.fill")
+                    Text("Favorites")
+                }
+
+            ProfileView()
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Profile")
+                }
         }
-        .padding()
+        .accentColor(.blue)
     }
-
-    private func logout() {
-        session.logout()
-    }
-}
-
-#Preview {
-    MainTabView()
 }
