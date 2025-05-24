@@ -23,7 +23,7 @@ struct MovieCardView: View {
                     .font(.headline)
                     .lineLimit(2)
 
-                Text("Year: \(movie.year)")
+                Text("Year: \(String(movie.year))")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 

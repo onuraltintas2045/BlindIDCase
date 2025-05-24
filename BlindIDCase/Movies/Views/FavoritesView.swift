@@ -8,12 +8,25 @@
 import SwiftUI
 
 struct FavoritesView: View {
+    @ObservedObject var viewModel: HomeViewModel
+    
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Favorites")
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(viewModel.favoriteMovies) { movie in
+                        MovieCardView(movie: movie)
+                            .padding(.horizontal)
+                    }
+                }
+                .padding(.top)
             }
+            .padding(.bottom)
+            .background(Color.black.opacity(0.3))
             .navigationTitle("Favorites")
+            .onAppear {
+                viewModel.filterFavoriteMovies()
+            }
         }
     }
 }

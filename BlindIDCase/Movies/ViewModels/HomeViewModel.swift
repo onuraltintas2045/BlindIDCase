@@ -11,6 +11,7 @@ import Foundation
 class HomeViewModel: ObservableObject {
     
     @Published var movies: [Movie] = []
+    @Published var favoriteMovies: [Movie] = []
     @Published var isFethingData: Bool = false
     @Published var errorMessage: String?
     
@@ -20,6 +21,7 @@ class HomeViewModel: ObservableObject {
         self.movieService = movieService
     }
     
+    //HomeView' a her gelindiğinde istek atılsın isteniyorsa burası kaldırılabilir.
     func fetchMoviesIfNeeded() {
         guard movies.isEmpty else { return }
         Task {
@@ -36,5 +38,13 @@ class HomeViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
         isFethingData = false
+    }
+    
+    func filterFavoriteMovies() {
+        guard let favoriteMovieIDs = UserDataManager.shared.currentUser?.likedMovies else {
+            favoriteMovies = movies
+            return
+        }
+        favoriteMovies = movies.filter { favoriteMovieIDs.contains($0.id) }
     }
 }

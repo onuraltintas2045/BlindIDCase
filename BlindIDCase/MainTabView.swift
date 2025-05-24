@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @StateObject private var viewModel = HomeViewModel()
     
     init() {
         UITabBar.appearance().backgroundColor = UIColor.systemGray6
@@ -15,13 +16,13 @@ struct MainTabView: View {
     
     var body: some View {
         TabView {
-            HomeView()
+            HomeView(viewModel: viewModel)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")
                 }
 
-            FavoritesView()
+            FavoritesView(viewModel: viewModel)
                 .tabItem {
                     Image(systemName: "heart.fill")
                     Text("Favorites")
