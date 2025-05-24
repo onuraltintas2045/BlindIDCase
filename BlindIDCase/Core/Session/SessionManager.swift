@@ -9,8 +9,7 @@ import Foundation
 
 final class SessionManager: ObservableObject {
     static let shared = SessionManager()
-    @Published var authState: AuthState = .checkingToken
-    @Published var currentUser: User?
+    @Published var authState: AuthState = .fetchingCurrentUser
 
     private init() {
         validateSession()
@@ -22,26 +21,28 @@ final class SessionManager: ObservableObject {
             return
         }
         
-        UserService.shared.getCurrentUser { result in
-            DispatchQueue.main.async {
-                switch result {
-                    case .success(let user):
-                        self.currentUser = user
-                        self.authState = .loggedIn
-                    case .failure:
-                        self.authState = .loggedOut
-                }
-            }
+        self.authState = .fetchingCurrentUser
+        
+        UserDataManager.shared.fetchCurrentUser { success in
+
+            success ? (self.authState = .loggedIn) : self.logout()
+            
         }
     }
 
     func logout() {
         KeychainManager.clear()
+        UserDataManager.shared.clearUser()
         self.authState = .loggedOut
     }
     
     func login(with token: String) {
         KeychainManager.save(token: token)
-        self.authState = .loggedIn
+        
+        self.authState = .fetchingCurrentUser
+
+        UserDataManager.shared.fetchCurrentUser { success in
+            success ? (self.authState = .loggedIn) : self.logout()
+        }
     }
 }

@@ -9,11 +9,10 @@ import SwiftUI
 
 @main
 struct BlindIDCaseApp: App {
-    @StateObject private var session = SessionManager.shared
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environmentObject(session)
+                .environmentObject(SessionManager.shared)
         }
     }
 }

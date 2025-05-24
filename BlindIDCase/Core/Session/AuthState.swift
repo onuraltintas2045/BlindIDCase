@@ -8,7 +8,7 @@
 import Foundation
 
 enum AuthState {
-    case checkingToken
+    case fetchingCurrentUser
     case loggedIn
     case loggedOut
 }

@@ -11,7 +11,7 @@ struct RootView: View {
     @EnvironmentObject var session: SessionManager
     var body: some View {
         switch session.authState {
-            case .checkingToken:
+            case .fetchingCurrentUser:
                 SplashView()
             case .loggedIn:
                 MainTabView()
