@@ -33,7 +33,12 @@ class HomeViewModel: ObservableObject {
         isFetchingData = true
         do {
             let fetchedMovies = try await movieService.fetchMovies()
-            movies = fetchedMovies
+            let likedMovieIDs = UserDataManager.shared.currentUser?.likedMovies ?? []
+            movies = fetchedMovies.map { movie in
+                var updated = movie
+                updated.isLiked = likedMovieIDs.contains(movie.id)
+                return updated
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -41,10 +46,16 @@ class HomeViewModel: ObservableObject {
     }
     
     func filterFavoriteMovies() {
-        guard let favoriteMovieIDs = UserDataManager.shared.currentUser?.likedMovies else {
-            favoriteMovies = movies
-            return
+        favoriteMovies = movies.filter { $0.isLiked }
+    }
+    
+    func refreshIsLikedStatesFromUser() {
+        let likedIDs = UserDataManager.shared.currentUser?.likedMovies ?? []
+        movies = movies.map { movie in
+            var updated = movie
+            updated.isLiked = likedIDs.contains(movie.id)
+            return updated
         }
-        favoriteMovies = movies.filter { favoriteMovieIDs.contains($0.id) }
+        filterFavoriteMovies()
     }
 }

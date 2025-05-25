@@ -9,15 +9,19 @@ import SwiftUI
 import Kingfisher
 
 struct MovieDetailView: View {
-    let movie: Movie
+    @StateObject private var viewModel: MovieDetailViewModel
     @State private var isFavorite: Bool = false
+    
+    init(movie: Movie) {
+        _viewModel = StateObject(wrappedValue: MovieDetailViewModel(movie: movie))
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 
                 HStack {
-                    KFImage(URL(string: movie.posterUrl))
+                    KFImage(URL(string: viewModel.movie.posterUrl))
                         .resizable()
                         .cancelOnDisappear(true)
                         .placeholder {
@@ -35,14 +39,14 @@ struct MovieDetailView: View {
                 .frame(maxWidth: .infinity)
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(movie.title)
+                    Text(viewModel.movie.title)
                         .font(.title)
                         .fontWeight(.bold)
                     
                     HStack {
-                        Text("📅 \(String(movie.year))")
-                        Text("🎭 \(movie.category)")
-                        Text("⭐️ \(String(format: "%.1f", movie.rating))")
+                        Text("📅 \(String(viewModel.movie.year))")
+                        Text("🎭 \(viewModel.movie.category)")
+                        Text("⭐️ \(String(format: "%.1f", viewModel.movie.rating))")
                     }
                     .font(.subheadline)
                     .foregroundColor(.black)
@@ -55,7 +59,7 @@ struct MovieDetailView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Description")
                         .font(.headline)
-                    Text(movie.description)
+                    Text(viewModel.movie.description)
                         .font(.body)
                 }
                 .padding(.horizontal)
@@ -63,7 +67,7 @@ struct MovieDetailView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Actors")
                         .font(.headline)
-                    ForEach(movie.actors, id: \.self) { actor in
+                    ForEach(viewModel.movie.actors, id: \.self) { actor in
                         Text("• \(actor)")
                             .font(.body)
                     }
@@ -71,12 +75,14 @@ struct MovieDetailView: View {
                 .padding(.horizontal)
 
                 Button(action: {
-                    isFavorite.toggle()
+                    Task {
+                        await viewModel.toggleFavoriteStatus()
+                    }
                 }) {
                     HStack {
-                        Image(systemName: isFavorite ? "heart.fill" : "heart")
-                            .foregroundColor(isFavorite ? .red : .primary)
-                        Text(isFavorite ? "Unfavorite" : "Add Favorite")
+                        Image(systemName: viewModel.movie.isLiked ? "heart.fill" : "heart")
+                            .foregroundColor(viewModel.movie.isLiked ? .red : .primary)
+                        Text(viewModel.movie.isLiked ? "Unfavorite" : "Add Favorite")
                     }
                     .font(.headline)
                     .padding()

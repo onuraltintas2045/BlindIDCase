@@ -15,8 +15,11 @@ struct FavoritesView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(viewModel.favoriteMovies) { movie in
-                        MovieCardView(movie: movie)
-                            .padding(.horizontal)
+                        NavigationLink(destination: MovieDetailView(movie: movie)) {
+                            MovieCardView(movie: movie)
+                                .padding(.horizontal)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 .padding(.top)
@@ -25,7 +28,7 @@ struct FavoritesView: View {
             .background(Color.black.opacity(0.1))
             .navigationTitle("Favorites")
             .onAppear {
-                viewModel.filterFavoriteMovies()
+                viewModel.refreshIsLikedStatesFromUser()
             }
         }
     }

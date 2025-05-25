@@ -16,6 +16,8 @@ struct Movie: Identifiable, Codable, Equatable {
     let category: String
     let posterUrl: String
     let description: String
+    
+    var isLiked: Bool = false
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -29,16 +31,27 @@ struct Movie: Identifiable, Codable, Equatable {
     }
 }
 
-enum MovieServiceError: Error {
+struct LikeMovieResponse: Codable {
+    let message: String
+    let likedMovies: [Int]
+}
+
+enum MovieServiceError: Error, LocalizedError {
     case invalidResponse
     case decodingError(Error)
-
+    case missingToken
+    case invalidURL
+    
     var errorDescription: String? {
         switch self {
         case .invalidResponse:
-            return "Geçersiz sunucu yanıtı."
+            return "Sunucudan geçerli bir yanıt alınamadı."
         case .decodingError(let error):
             return "Veri çözümlenemedi: \(error.localizedDescription)"
+        case .missingToken:
+            return "Kullanıcı doğrulama bilgisi eksik."
+        case .invalidURL:
+            return "URL hatalı."
         }
     }
 }

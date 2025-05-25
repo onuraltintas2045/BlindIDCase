@@ -3,4 +3,52 @@
    uuid = "56CA8B8D-F946-4930-9182-E75947CDB8EC"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "FB46D730-E1E5-464A-B7C7-784AC890B7E2"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "BlindIDCase/Movies/ViewModels/MovieDetailViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "toggleFavoriteStatus()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "FB46D730-E1E5-464A-B7C7-784AC890B7E2 - 591de4ec2670e6f4"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(6) suspend resume partial function for BlindIDCase.MovieDetailViewModel.toggleFavoriteStatus() async -&gt; ()"
+                  moduleName = "BlindIDCase.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/onuraltintas/Desktop/BlindIdCase/BlindIDCase/BlindIDCase/Movies/ViewModels/MovieDetailViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
+               </Location>
+               <Location
+                  uuid = "FB46D730-E1E5-464A-B7C7-784AC890B7E2 - 9106e861ee741cf3"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for BlindIDCase.MovieDetailViewModel.toggleFavoriteStatus() async -&gt; ()"
+                  moduleName = "BlindIDCase.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/onuraltintas/Desktop/BlindIdCase/BlindIDCase/BlindIDCase/Movies/ViewModels/MovieDetailViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
