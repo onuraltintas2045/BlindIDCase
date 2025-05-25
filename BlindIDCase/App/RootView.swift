@@ -12,7 +12,7 @@ struct RootView: View {
     var body: some View {
         switch session.authState {
             case .fetchingCurrentUser:
-                SplashView()
+                LoadingOverlayView()
             case .loggedIn:
                 MainTabView()
             case .loggedOut:

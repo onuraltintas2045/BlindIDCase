@@ -46,13 +46,13 @@ enum AuthError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidCredentials:
-            return "E-posta veya şifre hatalı."
+            return "Incorrect email or password."
         case .userAlreadyExists:
-            return "Bu e-posta adresi zaten kullanılıyor."
+            return "This email address is already in use."
         case .requestError:
-            return "Bir hata oluştu. Lütfen tekrar deneyin."
+            return "An error occurred. Please try again."
         case .unknown:
-            return "Bilinmeyen bir hata oluştu."
+            return "An unknown error occurred."
         }
     }
 }

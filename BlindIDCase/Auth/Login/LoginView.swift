@@ -10,22 +10,23 @@ import SwiftUI
 // TODO: - Klavye yüksekliğine göre layout güncellemesi yapılmalı
 struct LoginView: View {
     
+    // MARK: - Properties
     @StateObject private var viewModel = LoginViewModel()
     @State var isPasswordVisible: Bool = false
     
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Spacer().frame(height: 60)
+                Spacer().frame(height: 30)
                 
+                // MARK: - Logo
                 Image("Logo")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 120, height: 120)
                     .clipped()
                 
-                Spacer().frame(height: 40)
-                
+                // MARK: - Form Fields
                 TextField("Email", text: $viewModel.email)
                     .keyboardType(.emailAddress)
                     .font(.system(size: 14, weight: .regular, design: .default))
@@ -66,21 +67,16 @@ struct LoginView: View {
                         .padding(.horizontal, 8)
                 }
                 
+                // MARK: - Login Button
                 Button {
                     viewModel.login()
                 } label: {
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                    } else {
-                        Text("Log In")
-                            .foregroundColor(.white)
-                            .font(.system(size: 12, weight: .regular, design: .default))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                    }
+                    Text("Log In")
+                        .foregroundColor(.white)
+                        .font(.system(size: 12, weight: .regular, design: .default))
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                    
                 }
                 .background(Color.blue)
                 .frame(height: 35)
@@ -88,6 +84,7 @@ struct LoginView: View {
                 
                 Spacer()
 
+                // MARK: - Navigation Link
                 VStack(spacing: 0) {
                     NavigationLink(destination: RegisterView()) {
                         Text("Create an Account")
@@ -110,8 +107,23 @@ struct LoginView: View {
             }
             .padding()
             .allowsHitTesting(!viewModel.isLoading)
-            .background(viewModel.isLoading ? Color.black.opacity(0.3) : Color.white)
+            .background(
+                Group {
+                    if viewModel.isLoading {
+                        LoadingOverlayView()
+                    } else {
+                        Color.white
+                    }
+                }
+            )
             
+        }
+        .alert(isPresented: $viewModel.showError) {
+            Alert(
+                title: Text("Login Failed"),
+                message: Text(viewModel.loginErrorMessage ?? "Unknown error"),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
 }
