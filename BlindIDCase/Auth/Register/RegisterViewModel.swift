@@ -9,33 +9,29 @@ import Foundation
 
 @MainActor
 final class RegisterViewModel: ObservableObject {
+    
+    // MARK: - Published Properties
     @Published var email: String = "" {
         didSet {
-            if showEmailError && !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                showEmailError = false
-            }
+            updateEmailErrorState()
         }
     }
 
     @Published var firstName: String = "" {
         didSet {
-            if showFirstNameError && !firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                showFirstNameError = false
-            }
+            updateNameErrorState()
         }
     }
 
     @Published var lastName: String = "" {
         didSet {
-            if showLastNameError && !lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                showLastNameError = false
-            }
+            updateSurnameErrorState()
         }
     }
 
     @Published var password: String = "" {
         didSet {
-            showPasswordError = password.count < 6
+            updatePasswordErrorState()
         }
     }
 
@@ -45,13 +41,17 @@ final class RegisterViewModel: ObservableObject {
     @Published var showLastNameError: Bool = false
     @Published var showPasswordError: Bool = false
     @Published var registerErrorMessage: String?
-
+    @Published var showError: Bool = false
+    
+    // MARK: - Dependencies
     private let authService: AuthServiceProtocol
 
+    // MARK: - Init
     init(authService: AuthServiceProtocol = AuthService.shared) {
         self.authService = authService
     }
 
+    // MARK: - Public Methods
     func validateFields() -> Bool {
         showEmailError = email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         showFirstNameError = firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -75,10 +75,35 @@ final class RegisterViewModel: ObservableObject {
                 SessionManager.shared.login(with: response.token)
             } catch let error as AuthError {
                 registerErrorMessage = error.localizedDescription
+                self.showError = true
             } catch {
                 registerErrorMessage = "Bilinmeyen bir hata oluştu."
+                self.showError = true
             }
             isLoading = false
         }
+    }
+    
+    // MARK: - Private Methods
+    private func updateEmailErrorState() {
+        if showEmailError && !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            showEmailError = false
+        }
+    }
+    
+    private func updateNameErrorState() {
+        if showFirstNameError && !firstName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            showFirstNameError = false
+        }
+    }
+    
+    private func updateSurnameErrorState() {
+        if showLastNameError && !lastName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            showLastNameError = false
+        }
+    }
+    
+    private func updatePasswordErrorState() {
+        showPasswordError = password.count < 6
     }
 }

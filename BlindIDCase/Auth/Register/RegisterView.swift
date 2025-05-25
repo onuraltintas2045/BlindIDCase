@@ -9,6 +9,7 @@ import SwiftUI
 // TODO: - Klavyenin açılmasına göre layout güncellenecek.
 struct RegisterView: View {
     
+    // MARK: - Properties
     @StateObject private var viewModel = RegisterViewModel()
     @State private var isPasswordVisible: Bool = false
 
@@ -16,14 +17,14 @@ struct RegisterView: View {
         VStack(spacing: 20) {
             Spacer().frame(height: 20)
             
+            // MARK: - Logo
             Image("LaunchImage")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 120, height: 60)
                 .clipped()
             
-            Spacer().frame(height: 20)
-
+            // MARK: - Form Fields
             TextField("Email", text: $viewModel.email)
                 .keyboardType(.emailAddress)
                 .font(.system(size: 14, weight: .regular, design: .default))
@@ -87,21 +88,16 @@ struct RegisterView: View {
                     .padding(.horizontal, 8)
             }
 
+            // MARK: - Login Button
             Button {
                 viewModel.register()
             } label: {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                } else {
-                    Text("Sign Up")
-                        .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .regular, design: .default))
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                }
+                Text("Sign Up")
+                    .foregroundColor(.white)
+                    .font(.system(size: 14, weight: .regular, design: .default))
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                
             }
             .background(Color.blue)
             .frame(height: 45)
@@ -111,6 +107,21 @@ struct RegisterView: View {
         }
         .padding()
         .allowsHitTesting(!viewModel.isLoading)
-        .background(viewModel.isLoading ? Color.black.opacity(0.3) : Color.white)
+        .background(
+            Group {
+                if viewModel.isLoading {
+                    LoadingOverlayView()
+                } else {
+                    Color.white
+                }
+            }
+        )
+        .alert(isPresented: $viewModel.showError) {
+            Alert(
+                title: Text("Registration Failed"),
+                message: Text(viewModel.registerErrorMessage ?? "An unknown error occurred."),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
 }
