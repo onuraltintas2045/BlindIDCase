@@ -29,6 +29,18 @@ final class UserDataManager: ObservableObject {
             return false
         }
     }
+    
+    func updateCurrentUser(name: String, surname: String, email: String) {
+        guard currentUser != nil else { return }
+        currentUser?.name = name
+        currentUser?.surname = surname
+        currentUser?.email = email
+    }
+    
+    func updateLikedMovies(likedMovies: [Int]) {
+        guard currentUser != nil else { return }
+        currentUser?.likedMovies = likedMovies
+    }
 
     func clearUser() {
         self.currentUser = nil

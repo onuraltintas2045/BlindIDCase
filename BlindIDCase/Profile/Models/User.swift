@@ -9,10 +9,10 @@ import Foundation
 
 struct User: Codable {
     let id: String
-    let name: String
-    let surname: String
-    let email: String
-    let likedMovies: [Int]
+    var name: String
+    var surname: String
+    var email: String
+    var likedMovies: [Int]
     let createdAt: String
     let updatedAt: String
 
@@ -32,4 +32,16 @@ enum UserServiceError: Error {
     case requestFailed(Error)
     case decodingFailed
     case unknown
+}
+
+struct UpdateUserProfileRequest: Codable {
+    let name: String
+    let surname: String
+    let email: String
+    let password: String
+}
+
+struct UpdateUserProfileResponse: Codable {
+    let message: String
+    let user: AuthUser
 }

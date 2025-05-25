@@ -9,9 +9,9 @@ import Foundation
 
 protocol UserServiceProtocol {
     func getCurrentUser() async throws -> User
+    func updateUserProfile(_ request: UpdateUserProfileRequest) async throws -> AuthUser
 }
 
-// TODO: - AuthService' de yaptığımız response handling buraya da uygulanacak, en son bütün Service yapıları ortaklanabilir mi diye bakılacak.
 final class UserService: UserServiceProtocol {
     
     static let shared = UserService()
@@ -45,6 +45,40 @@ final class UserService: UserServiceProtocol {
             }
         case 401:
             throw UserServiceError.invalidToken
+        default:
+            throw UserServiceError.unknown
+        }
+    }
+
+    func updateUserProfile(_ requestBody: UpdateUserProfileRequest) async throws -> AuthUser {
+        guard let token = KeychainManager.readToken(), !token.isEmpty else {
+            throw UserServiceError.invalidToken
+        }
+
+        guard let url = URL(string: "https://moviatask.cerasus.app/api/users/profile") else {
+            throw UserServiceError.unknown
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(requestBody)
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw UserServiceError.unknown
+        }
+
+        switch httpResponse.statusCode {
+        case 200:
+            do {
+                let decodedResponse = try JSONDecoder().decode(UpdateUserProfileResponse.self, from: data)
+                return decodedResponse.user
+            } catch {
+                throw UserServiceError.decodingFailed
+            }
         default:
             throw UserServiceError.unknown
         }
