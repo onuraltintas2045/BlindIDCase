@@ -10,17 +10,21 @@ import Foundation
 @MainActor
 class HomeViewModel: ObservableObject {
     
+    // MARK: - Published Properties
     @Published var movies: [Movie] = []
     @Published var favoriteMovies: [Movie] = []
     @Published var isFetchingData: Bool = false
     @Published var errorMessage: String?
     
+    // MARK: - Dependencies
     private let movieService: MovieServiceProtocol
 
+    // MARK: - Init
     init(movieService: MovieServiceProtocol = MovieService()) {
         self.movieService = movieService
     }
     
+    // MARK: - Public Methods
     //HomeView' a her gelindiğinde istek atılsın isteniyorsa burası kaldırılabilir.
     func fetchMoviesIfNeeded() {
         guard movies.isEmpty else { return }

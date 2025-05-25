@@ -8,31 +8,47 @@
 import SwiftUI
 
 struct HomeView: View {
+    
+    // MARK: - Properties
     @ObservedObject var viewModel: HomeViewModel
 
+    // MARK: - Body
     var body: some View {
         NavigationView {
-            ScrollView {
-                //LazyVStack kullanıldığında KingFisher görseller için her ekrana girdiğinde istek atıyor.
-                //Veri sayısı az ve api pagination yapısına sahip değil. O sebeple VStack şu an için uygun.
-                VStack(spacing: 16) {
-                    ForEach(viewModel.movies) { movie in
-                        NavigationLink(destination: MovieDetailView(movie: movie)) {
-                            MovieCardView(movie: movie)
-                                .padding(.horizontal)
+            ZStack {
+                // MARK: - Movie List, EmptyView
+                ScrollView {
+                    VStack(spacing: 16) {
+                        if viewModel.movies.isEmpty {
+                            EmptyStateView(
+                                title: "No Movies",
+                                message: "There are no movies to display. Please try again later.",
+                                systemImageName: "film"
+                            )
+                            .padding(.top, 100)
+                        } else {
+                            ForEach(viewModel.movies) { movie in
+                                NavigationLink(destination: MovieDetailView(movie: movie)) {
+                                    MovieCardView(movie: movie)
+                                        .padding(.horizontal)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
                         }
-                        .buttonStyle(PlainButtonStyle())
                     }
+                    .padding(.top)
                 }
-                .padding(.top)
-            }
-            .padding(.bottom)
-            .background(Color.black.opacity(0.1))
-            .navigationTitle("Movies")
-            .onAppear {
-                viewModel.fetchMoviesIfNeeded()
+                .padding(.bottom)
+                .background(Color.black.opacity(0.1))
+                .navigationTitle("Movies")
+                .onAppear {
+                    viewModel.fetchMoviesIfNeeded()
+                }
+
+                if viewModel.isFetchingData {
+                    LoadingOverlayView()
+                }
             }
         }
-        
     }
 }
