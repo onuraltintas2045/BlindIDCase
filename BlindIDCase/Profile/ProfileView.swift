@@ -9,22 +9,25 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
+    @EnvironmentObject private var keyboard: KeyboardResponder
 
     var body: some View {
         ZStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    Spacer().frame(height: 30)
-
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 120, height: 120)
-                        .clipShape(Circle())
-                        .foregroundColor(.blue)
-
-                    formField(title: "Name", text: $viewModel.name, showError: viewModel.showNameError, isEditing: viewModel.isEditing, icon: "person.fill")
-                    formField(title: "Surname", text: $viewModel.surname, showError: viewModel.showSurnameError, isEditing: viewModel.isEditing, icon: "person.text.rectangle")
-                    formField(title: "Email", text: $viewModel.email, showError: viewModel.showEmailError, isEditing: viewModel.isEditing, icon: "envelope.fill")
+                    Spacer().frame(maxHeight: keyboard.isKeyboardVisible ? 0 : 20)
+                    
+                    if !keyboard.isKeyboardVisible {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .frame(width: 120, height: 120)
+                            .clipShape(Circle())
+                            .foregroundColor(.blue)
+                    }
+                    
+                    formField(title: "Name", text: $viewModel.name, showError: viewModel.showNameError, isEditing: viewModel.isEditing, icon: "person.fill").frame(maxHeight: 35)
+                    formField(title: "Surname", text: $viewModel.surname, showError: viewModel.showSurnameError, isEditing: viewModel.isEditing, icon: "person.text.rectangle").frame(maxHeight: 35)
+                    formField(title: "Email", text: $viewModel.email, showError: viewModel.showEmailError, isEditing: viewModel.isEditing, icon: "envelope.fill").frame(maxHeight: 35)
 
                     if viewModel.isEditing {
                         formField(
@@ -35,7 +38,7 @@ struct ProfileView: View {
                             icon: "lock.fill",
                             isSecure: true,
                             isPasswordVisible: $viewModel.isPasswordVisible
-                        )
+                        ).frame(maxHeight: 35)
                     }
 
                     if viewModel.showPasswordError {
@@ -64,36 +67,34 @@ struct ProfileView: View {
                         Text(viewModel.isEditing ? "Save" : "Edit")
                             .foregroundColor(.white)
                             .font(.system(size: 14))
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, maxHeight: 35)
                             .padding()
                         
                     }
                     .background(viewModel.isEditing ? Color.green : Color.blue)
                     .cornerRadius(12)
                     .padding(.horizontal)
-
-                    Spacer()
                     
                     Button {
                         SessionManager.shared.logout()
                     } label: {
                         Text("Log Out")
-                            .foregroundColor(.red)
+                            .foregroundColor(.white)
+                            .font(.system(size: 14))
+                            .frame(maxWidth: .infinity, maxHeight: 35)
                             .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.red.opacity(0.1))
+                            .background(Color.red)
                             .cornerRadius(12)
                     }
                     .padding(.horizontal)
-                    .padding()
                 }
-                .padding(.vertical)
             }
 
             if viewModel.isLoading {
                 LoadingOverlayView()
             }
         }
+        .frame(maxHeight: keyboard.isKeyboardVisible ? (UIScreen.main.bounds.height - keyboard.keyboardHeight) : .infinity)
         .allowsHitTesting(!viewModel.isLoading)
         .onDisappear {
             viewModel.isEditing = false

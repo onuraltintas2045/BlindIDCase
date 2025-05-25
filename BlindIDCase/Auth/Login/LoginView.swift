@@ -7,31 +7,34 @@
 
 import SwiftUI
 
-// TODO: - Klavye yüksekliğine göre layout güncellemesi yapılmalı
 struct LoginView: View {
     
     // MARK: - Properties
     @StateObject private var viewModel = LoginViewModel()
     @State var isPasswordVisible: Bool = false
+    @EnvironmentObject private var keyboard: KeyboardResponder
     
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Spacer().frame(height: 30)
+                Spacer().frame(height: keyboard.isKeyboardVisible ? 0 : 30)
                 
                 // MARK: - Logo
-                Image("Logo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 120, height: 120)
-                    .clipped()
+                if !keyboard.isKeyboardVisible {
+                    Image("Logo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: 120, maxHeight: 120)
+                        .clipped()
+                }
+                
                 
                 // MARK: - Form Fields
                 TextField("Email", text: $viewModel.email)
                     .keyboardType(.emailAddress)
                     .font(.system(size: 14, weight: .regular, design: .default))
                     .padding()
-                    .frame(height: 45)
+                    .frame(maxHeight: 45)
                     .background(RoundedRectangle(cornerRadius: 8)
                         .stroke(viewModel.showEmailError ? Color.red : Color.gray, lineWidth: 1))
                 
@@ -46,7 +49,7 @@ struct LoginView: View {
                     .font(.system(size: 14, weight: .regular, design: .default))
                     .padding(.trailing, 40)
                     .padding()
-                    .frame(height: 45)
+                    .frame(maxHeight: 45)
                     .background(RoundedRectangle(cornerRadius: 8)
                         .stroke(viewModel.showPasswordError ? Color.red : Color.gray, lineWidth: 1))
                     
@@ -79,14 +82,14 @@ struct LoginView: View {
                     
                 }
                 .background(Color.blue)
-                .frame(height: 35)
+                .frame(maxHeight: 35)
                 .cornerRadius(8)
                 
                 Spacer()
 
                 // MARK: - Navigation Link
                 VStack(spacing: 0) {
-                    NavigationLink(destination: RegisterView()) {
+                    NavigationLink(destination: RegisterView().environmentObject(keyboard)) {
                         Text("Create an Account")
                             .foregroundColor(.blue)
                             .font(.system(size: 12, weight: .regular, design: .default))
@@ -105,6 +108,7 @@ struct LoginView: View {
                 }
                 
             }
+            .frame(maxHeight: keyboard.isKeyboardVisible ? (UIScreen.main.bounds.height - keyboard.keyboardHeight) : .infinity)
             .padding()
             .allowsHitTesting(!viewModel.isLoading)
             .background(

@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainTabView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @EnvironmentObject private var keyboard: KeyboardResponder
     
     init() {
         UITabBar.appearance().backgroundColor = UIColor.systemGray6
@@ -33,6 +34,7 @@ struct MainTabView: View {
                     Image(systemName: "person.fill")
                     Text("Profile")
                 }
+                .environmentObject(keyboard)
         }
         .accentColor(.blue)
     }
