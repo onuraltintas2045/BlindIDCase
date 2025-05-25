@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct MovieCardView: View {
     let movie: Movie
@@ -13,10 +14,19 @@ struct MovieCardView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             // TODO: - Image için KingFisher eklenecek
-            Color.gray.opacity(0.3)
-            .frame(width: 100, height: 150)
-            .cornerRadius(8)
-            .clipped()
+            KFImage(URL(string: movie.posterUrl))
+                .resizable()
+                .cancelOnDisappear(true)
+                .cacheOriginalImage()
+                .placeholder {
+                    Color.gray.opacity(0.3)
+                }
+                .onFailure { _ in
+                    print("hata")
+                }
+                .frame(width: 100, height: 150)
+                .cornerRadius(8)
+                .clipped()
 
             VStack(alignment: .leading, spacing: 6) {
                 Text(movie.title)

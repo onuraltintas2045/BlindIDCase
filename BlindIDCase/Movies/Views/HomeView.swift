@@ -13,7 +13,9 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 16) {
+                //LazyVStack kullanıldığında KingFisher görseller için her ekrana girdiğinde istek atıyor.
+                //Veri sayısı az ve api pagination yapısına sahip değil. O sebeple VStack şu an için uygun.
+                VStack(spacing: 16) {
                     ForEach(viewModel.movies) { movie in
                         MovieCardView(movie: movie)
                             .padding(.horizontal)

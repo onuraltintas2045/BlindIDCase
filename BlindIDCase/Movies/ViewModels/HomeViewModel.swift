@@ -12,7 +12,7 @@ class HomeViewModel: ObservableObject {
     
     @Published var movies: [Movie] = []
     @Published var favoriteMovies: [Movie] = []
-    @Published var isFethingData: Bool = false
+    @Published var isFetchingData: Bool = false
     @Published var errorMessage: String?
     
     private let movieService: MovieServiceProtocol
@@ -30,14 +30,14 @@ class HomeViewModel: ObservableObject {
     }
     
     func fetchMovies() async {
-        isFethingData = true
+        isFetchingData = true
         do {
             let fetchedMovies = try await movieService.fetchMovies()
             movies = fetchedMovies
         } catch {
             errorMessage = error.localizedDescription
         }
-        isFethingData = false
+        isFetchingData = false
     }
     
     func filterFavoriteMovies() {

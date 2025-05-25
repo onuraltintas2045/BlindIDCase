@@ -13,7 +13,7 @@ struct FavoritesView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                LazyVStack(spacing: 16) {
+                VStack(spacing: 16) {
                     ForEach(viewModel.favoriteMovies) { movie in
                         MovieCardView(movie: movie)
                             .padding(.horizontal)
