@@ -9,94 +9,110 @@ import SwiftUI
 import Kingfisher
 
 struct MovieDetailView: View {
+    
+    // MARK: - Properties
     @StateObject private var viewModel: MovieDetailViewModel
     @State private var isFavorite: Bool = false
     
+    // MARK: - Init
     init(movie: Movie) {
         _viewModel = StateObject(wrappedValue: MovieDetailViewModel(movie: movie))
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                
-                HStack {
-                    KFImage(URL(string: viewModel.movie.posterUrl))
-                        .resizable()
-                        .cancelOnDisappear(true)
-                        .placeholder {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 300, height: 450)
-                                .foregroundColor(.clear)
-                        }
-                        .frame(width: 300, height: 450)
-                        .scaledToFit()
-                        .cornerRadius(12)
-                        .shadow(radius: 6)
-                }
-                .frame(maxWidth: .infinity)
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(viewModel.movie.title)
-                        .font(.title)
-                        .fontWeight(.bold)
-                    
+        ZStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    // MARK: - MovieImage
                     HStack {
-                        Text("📅 \(String(viewModel.movie.year))")
-                        Text("🎭 \(viewModel.movie.category)")
-                        Text("⭐️ \(String(format: "%.1f", viewModel.movie.rating))")
+                        KFImage(URL(string: viewModel.movie.posterUrl))
+                            .resizable()
+                            .cancelOnDisappear(true)
+                            .placeholder {
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 300, height: 450)
+                                    .foregroundColor(.clear)
+                            }
+                            .frame(width: 300, height: 450)
+                            .scaledToFit()
+                            .cornerRadius(12)
+                            .shadow(radius: 6)
                     }
-                    .font(.subheadline)
-                    .foregroundColor(.black)
-                }
-                .padding(.horizontal)
-
-                Divider()
+                    .frame(maxWidth: .infinity)
+                    
+                    // MARK: - Movie Information
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(viewModel.movie.title)
+                            .font(.title)
+                            .fontWeight(.bold)
+                        
+                        HStack {
+                            Text("📅 \(String(viewModel.movie.year))")
+                            Text("🎭 \(viewModel.movie.category)")
+                            Text("⭐️ \(String(format: "%.1f", viewModel.movie.rating))")
+                        }
+                        .font(.subheadline)
+                        .foregroundColor(.black)
+                    }
                     .padding(.horizontal)
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Description")
-                        .font(.headline)
-                    Text(viewModel.movie.description)
-                        .font(.body)
-                }
-                .padding(.horizontal)
+                    Divider()
+                        .padding(.horizontal)
 
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Actors")
-                        .font(.headline)
-                    ForEach(viewModel.movie.actors, id: \.self) { actor in
-                        Text("• \(actor)")
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Description")
+                            .font(.headline)
+                        Text(viewModel.movie.description)
                             .font(.body)
                     }
-                }
-                .padding(.horizontal)
+                    .padding(.horizontal)
 
-                Button(action: {
-                    Task {
-                        await viewModel.toggleFavoriteStatus()
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Actors")
+                            .font(.headline)
+                        ForEach(viewModel.movie.actors, id: \.self) { actor in
+                            Text("• \(actor)")
+                                .font(.body)
+                        }
                     }
-                }) {
-                    HStack {
-                        Image(systemName: viewModel.movie.isLiked ? "heart.fill" : "heart")
-                            .foregroundColor(viewModel.movie.isLiked ? .red : .primary)
-                        Text(viewModel.movie.isLiked ? "Unfavorite" : "Add Favorite")
+                    .padding(.horizontal)
+
+                    // MARK: - Favorite Button
+                    Button(action: {
+                        viewModel.toggleFavorite()
+                    }) {
+                        HStack {
+                            Image(systemName: viewModel.movie.isLiked ? "heart.fill" : "heart")
+                                .foregroundColor(viewModel.movie.isLiked ? .red : .primary)
+                            Text(viewModel.movie.isLiked ? "Unfavorite" : "Add Favorite")
+                        }
+                        .font(.headline)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(10)
                     }
-                    .font(.headline)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
+                    .padding(.horizontal)
+                    .padding(.top)
                 }
-                .padding(.horizontal)
-                .padding(.top)
+                .padding(.vertical)
             }
-            .padding(.vertical)
             .background(Color.black.opacity(0.1))
+            .allowsHitTesting(!viewModel.isProcessing)
+            
+            if viewModel.isProcessing {
+                LoadingOverlayView()
+            }
         }
-        .navigationTitle("Movie Details")
-        .navigationBarTitleDisplayMode(.inline)
+        .alert(isPresented: $viewModel.showError) {
+            Alert(
+                title: Text("Error"),
+                message: Text(viewModel.errorMessage ?? "An unknown error occurred."),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+        
     }
 }

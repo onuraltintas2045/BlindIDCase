@@ -41,6 +41,7 @@ struct HomeView: View {
                 .padding(.bottom)
                 .background(Color.black.opacity(0.1))
                 .navigationTitle("Movies")
+                .allowsHitTesting(!viewModel.isFetchingData)
                 .onAppear {
                     viewModel.fetchMoviesIfNeeded()
                 }

@@ -41,6 +41,7 @@ struct FavoritesView: View {
                 .padding(.bottom)
                 .background(Color.black.opacity(0.1))
                 .navigationTitle("Favorites")
+                .allowsHitTesting(!viewModel.isFetchingData)
                 .onAppear {
                     viewModel.refreshIsLikedStatesFromUser()
                 }
