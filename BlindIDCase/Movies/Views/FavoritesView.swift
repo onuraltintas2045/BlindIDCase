@@ -22,7 +22,7 @@ struct FavoritesView: View {
                 .padding(.top)
             }
             .padding(.bottom)
-            .background(Color.black.opacity(0.3))
+            .background(Color.black.opacity(0.1))
             .navigationTitle("Favorites")
             .onAppear {
                 viewModel.filterFavoriteMovies()

@@ -93,6 +93,9 @@ struct ProfileView: View {
             .padding(.horizontal)
             .padding()
         }
+        .onDisappear {
+            viewModel.isEditing = false
+        }
     }
 
     @ViewBuilder

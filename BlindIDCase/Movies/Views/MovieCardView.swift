@@ -17,13 +17,14 @@ struct MovieCardView: View {
             KFImage(URL(string: movie.posterUrl))
                 .resizable()
                 .cancelOnDisappear(true)
-                .cacheOriginalImage()
                 .placeholder {
-                    Color.gray.opacity(0.3)
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 100, height: 150)
+                        .foregroundColor(.gray.opacity(0.4))
                 }
-                .onFailure { _ in
-                    print("hata")
-                }
+                .scaledToFit()
                 .frame(width: 100, height: 150)
                 .cornerRadius(8)
                 .clipped()
