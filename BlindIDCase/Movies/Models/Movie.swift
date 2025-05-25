@@ -45,13 +45,13 @@ enum MovieServiceError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidResponse:
-            return "Sunucudan geçerli bir yanıt alınamadı."
+            return "A valid response was not received from the server."
         case .decodingError(let error):
-            return "Veri çözümlenemedi: \(error.localizedDescription)"
+            return "Failed to decode the data: \(error.localizedDescription)"
         case .missingToken:
-            return "Kullanıcı doğrulama bilgisi eksik."
+            return "Authentication token is missing."
         case .invalidURL:
-            return "URL hatalı."
+            return "The URL is invalid."
         }
     }
 }
