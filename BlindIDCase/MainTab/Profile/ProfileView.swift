@@ -10,6 +10,9 @@ import SwiftUI
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @EnvironmentObject private var keyboard: KeyboardResponder
+    @State private var isPressed = false
+    @State private var buttonName: ClickedButton = .none
+    @State private var navigateToRegister = false
 
     var body: some View {
         ZStack {
@@ -59,9 +62,31 @@ struct ProfileView: View {
 
                     Button {
                         if viewModel.isEditing {
-                            viewModel.updateProfile()
+                            withAnimation(.easeIn(duration: 0.1)) {
+                                buttonName = .editProfile
+                                isPressed = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                withAnimation(.easeOut(duration: 0.1)) {
+                                    isPressed = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    viewModel.updateProfile()
+                                }
+                            }
                         } else {
-                            viewModel.isEditing = true
+                            withAnimation(.easeIn(duration: 0.1)) {
+                                buttonName = .editProfile
+                                isPressed = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                withAnimation(.easeOut(duration: 0.1)) {
+                                    isPressed = false
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    viewModel.isEditing = true
+                                }
+                            }
                         }
                     } label: {
                         Text(viewModel.isEditing ? "Save" : "Edit")
@@ -74,9 +99,21 @@ struct ProfileView: View {
                     .background(viewModel.isEditing ? Color.green : Color.blue)
                     .cornerRadius(12)
                     .padding(.horizontal)
+                    .scaleEffect((isPressed && buttonName == .editProfile) ? 0.8 : 1.0)
                     
                     Button {
-                        SessionManager.shared.logout()
+                        withAnimation(.easeIn(duration: 0.1)) {
+                            buttonName = .logOut
+                            isPressed = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            withAnimation(.easeOut(duration: 0.1)) {
+                                isPressed = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                SessionManager.shared.logout()
+                            }
+                        }
                     } label: {
                         Text("Log Out")
                             .foregroundColor(.white)
@@ -87,6 +124,8 @@ struct ProfileView: View {
                             .cornerRadius(12)
                     }
                     .padding(.horizontal)
+                    .scaleEffect((isPressed && buttonName == .logOut) ? 0.8 : 1.0)
+
                 }
             }
 

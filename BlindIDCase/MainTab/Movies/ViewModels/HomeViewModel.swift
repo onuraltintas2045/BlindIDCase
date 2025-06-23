@@ -13,7 +13,7 @@ class HomeViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var movies: [Movie] = []
     @Published var favoriteMovies: [Movie] = []
-    @Published var isFetchingData: Bool = false
+    @Published var isFetchingData: Bool = true
     @Published var errorMessage: String?
     
     // MARK: - Dependencies

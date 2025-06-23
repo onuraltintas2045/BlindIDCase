@@ -12,6 +12,9 @@ struct RegisterView: View {
     @StateObject private var viewModel = RegisterViewModel()
     @State private var isPasswordVisible: Bool = false
     @EnvironmentObject var keyboard: KeyboardResponder
+    @State private var isPressed = false
+    @State private var buttonName: ClickedButton = .none
+    @State private var navigateToRegister = false
 
     var body: some View {
         ScrollView{
@@ -68,12 +71,24 @@ struct RegisterView: View {
                         .stroke(viewModel.showPasswordError ? Color.red : Color.gray, lineWidth: 1))
                     
                     Button(action: {
-                        isPasswordVisible.toggle()
+                        withAnimation(.easeIn(duration: 0.1)) {
+                            buttonName = .password
+                            isPressed = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            withAnimation(.easeOut(duration: 0.1)) {
+                                isPressed = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isPasswordVisible.toggle()
+                            }
+                        }
                     }) {
                         Image(systemName: isPasswordVisible ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.gray)
                     }
                     .padding(.trailing, 12)
+                    .scaleEffect((isPressed && buttonName == .password) ? 0.7 : 1.0)
                 }
                 
                 if viewModel.showPasswordError {
@@ -94,7 +109,19 @@ struct RegisterView: View {
 
                 // MARK: - Login Button
                 Button {
-                    viewModel.register()
+                    withAnimation(.easeIn(duration: 0.1)) {
+                        buttonName = .register
+                        isPressed = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        withAnimation(.easeOut(duration: 0.1)) {
+                            isPressed = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            viewModel.register()
+                        }
+                    }
+                    
                 } label: {
                     Text("Sign Up")
                         .foregroundColor(.white)
@@ -106,6 +133,7 @@ struct RegisterView: View {
                 .background(Color.blue)
                 .frame(maxHeight: 45)
                 .cornerRadius(8)
+                .scaleEffect((isPressed && buttonName == .register) ? 0.8 : 1.0)
 
                 Spacer()
             }

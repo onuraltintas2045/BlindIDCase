@@ -13,6 +13,8 @@ struct MovieDetailView: View {
     // MARK: - Properties
     @StateObject private var viewModel: MovieDetailViewModel
     @State private var isFavorite: Bool = false
+    @State private var isPressed = false
+    @State private var buttonName: ClickedButton = .none
     
     // MARK: - Init
     init(movie: Movie) {
@@ -81,7 +83,18 @@ struct MovieDetailView: View {
 
                     // MARK: - Favorite Button
                     Button(action: {
-                        viewModel.toggleFavorite()
+                        withAnimation(.easeIn(duration: 0.1)) {
+                            buttonName = .addFavorite
+                            isPressed = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            withAnimation(.easeOut(duration: 0.1)) {
+                                isPressed = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                viewModel.toggleFavorite()
+                            }
+                        }
                     }) {
                         HStack {
                             Image(systemName: viewModel.movie.isLiked ? "heart.fill" : "heart")
@@ -96,6 +109,8 @@ struct MovieDetailView: View {
                     }
                     .padding(.horizontal)
                     .padding(.top)
+                    .scaleEffect((isPressed && buttonName == .addFavorite) ? 0.8 : 1.0)
+
                 }
                 .padding(.vertical)
             }

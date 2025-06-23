@@ -13,6 +13,9 @@ struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
     @State var isPasswordVisible: Bool = false
     @EnvironmentObject private var keyboard: KeyboardResponder
+    @State private var isPressed = false
+    @State private var buttonName: ClickedButton = .none
+    @State private var navigateToRegister = false
     
     var body: some View {
         NavigationView {
@@ -54,12 +57,24 @@ struct LoginView: View {
                         .stroke(viewModel.showPasswordError ? Color.red : Color.gray, lineWidth: 1))
                     
                     Button(action: {
-                        isPasswordVisible.toggle()
+                        withAnimation(.easeIn(duration: 0.1)) {
+                            buttonName = .password
+                            isPressed = true
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            withAnimation(.easeOut(duration: 0.1)) {
+                                isPressed = false
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isPasswordVisible.toggle()
+                            }
+                        }
                     }) {
                         Image(systemName: isPasswordVisible ? "eye.slash.fill" : "eye.fill")
                             .foregroundColor(.gray)
                     }
                     .padding(.trailing, 12)
+                    .scaleEffect((isPressed && buttonName == .password) ? 0.7 : 1.0)
                 }
                 
                 if viewModel.showEmailError || viewModel.showPasswordError  {
@@ -72,7 +87,20 @@ struct LoginView: View {
                 
                 // MARK: - Login Button
                 Button {
-                    viewModel.login()
+                    withAnimation(.easeIn(duration: 0.1)) {
+                        buttonName = .login
+                        isPressed = true
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        withAnimation(.easeOut(duration: 0.1)) {
+                            isPressed = false
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            viewModel.login()
+                        }
+                    }
+
+                    
                 } label: {
                     Text("Log In")
                         .foregroundColor(.white)
@@ -84,28 +112,53 @@ struct LoginView: View {
                 .background(Color.blue)
                 .frame(maxHeight: 35)
                 .cornerRadius(8)
+                .scaleEffect((isPressed && buttonName == .login) ? 0.8 : 1.0)
                 
                 Spacer()
 
                 // MARK: - Navigation Link
                 VStack(spacing: 0) {
-                    NavigationLink(destination: RegisterView().environmentObject(keyboard)) {
-                        Text("Create an Account")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 12, weight: .regular, design: .default))
-                            .frame(maxWidth: .infinity)
-                            .padding()
+                        NavigationLink(
+                            destination: RegisterView().environmentObject(keyboard),
+                            isActive: $navigateToRegister,
+                            label: { EmptyView() } // NavigationLink görünmez
+                        )
+
+                        Button {
+                            buttonName = .createAccount
+                            withAnimation(.easeIn(duration: 0.1)) {
+                                isPressed = true
+                            }
+
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                withAnimation(.easeOut(duration: 0.1)) {
+                                    isPressed = false
+                                }
+
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    navigateToRegister = true
+                                }
+                            }
+                        } label: {
+                            Text("Create an Account")
+                                .foregroundColor(.blue)
+                                .font(.system(size: 12, weight: .regular))
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                        }
+                        .frame(height: 35)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.blue, lineWidth: 1)
+                        )
+                        .scaleEffect((isPressed && buttonName == .createAccount) ? 0.8 : 1.0)
+
+                        Image("LaunchImage")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 80, height: 40)
+                            .clipped()
                     }
-                    .frame(height: 35)
-                    .background(RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.blue, lineWidth: 1))
-                    
-                    Image("LaunchImage")
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 80, height: 40)
-                        .clipped()
-                }
                 
             }
             .frame(maxHeight: keyboard.isKeyboardVisible ? (UIScreen.main.bounds.height - keyboard.keyboardHeight) : .infinity)
@@ -130,4 +183,18 @@ struct LoginView: View {
             )
         }
     }
+}
+
+
+enum ClickedButton {
+    case password
+    case login
+    case createAccount
+    case register
+    case addFavorite
+    case removeFavorite
+    case editProfile
+    case saveProfile
+    case logOut
+    case none
 }

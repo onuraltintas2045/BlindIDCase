@@ -19,7 +19,7 @@ struct HomeView: View {
                 // MARK: - Movie List, EmptyView
                 ScrollView {
                     VStack(spacing: 16) {
-                        if viewModel.movies.isEmpty {
+                        if viewModel.movies.isEmpty && viewModel.isFetchingData == false {
                             EmptyStateView(
                                 title: "No Movies",
                                 message: "There are no movies to display. Please try again later.",
